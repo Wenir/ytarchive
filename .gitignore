@@ -5,3 +5,4 @@ tofu/.env_tmp
 .env
 .direnv
 result
+.files.zip
