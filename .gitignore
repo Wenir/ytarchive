@@ -1,0 +1,7 @@
+tofu/.terraform
+tofu/.terraform.lock.hcl
+tofu/.terraform.lock.info
+tofu/.env_tmp
+.env
+.direnv
+result
