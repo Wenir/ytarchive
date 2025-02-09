@@ -4,6 +4,7 @@
 , coreutils
 , lib
 , app
+, writeShellApplication
 }:
 let
   env = buildEnv {
@@ -15,6 +16,13 @@ let
       coreutils
     ];
   };
+  cmd = writeShellApplication {
+    name = "${app.name}-docker-cmd";
+    text = ''
+      echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+      ${lib.getExe app}
+    '';
+  };
 in
 dockerTools.buildLayeredImage {
   name = "${app.name}-image";
@@ -24,7 +32,7 @@ dockerTools.buildLayeredImage {
   ];
   config = {
     Cmd = [
-     "${lib.getExe app}"
+      "${lib.getExe cmd}"
     ];
   };
 }
