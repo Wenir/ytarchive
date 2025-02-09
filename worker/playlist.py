@@ -30,6 +30,21 @@ def format_item(entry):
     return item
 
 
+def add_warning(key, item):
+    duration = item["duration"]
+
+    if duration is None:
+        item["warning"] = "unknown_duration"
+
+        return f"Item duration is unknown.\n{item}"
+
+    elif duration > 600:
+        duration = datetime.timedelta(seconds=item["duration"])
+        item["warning"] = "too_long"
+
+        return f"Item duration is too long.\n{duration}, {item["title"]}, {item["url"]}"
+
+
 if __name__ == "__main__":
     config = load_config()
     data = get_flat_playlist(config["SRC_PLAYLIST"])
@@ -49,9 +64,9 @@ if __name__ == "__main__":
             already_exists += 1
             continue
 
-        if (item["duration"] or 0) > 600:
-            duration = datetime.timedelta(seconds=item["duration"])
-            warnings.append(f"Item duration is too long.\n{duration}, {item["title"]}, {item["url"]}")
+        warning = add_warning(key, item)
+        if warning:
+            warnings.append(warning)
             data_manager.add_warning(key, item)
 
         data_manager.add_new_object(key, item)
