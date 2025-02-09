@@ -58,11 +58,20 @@ def archive_files(archive_path):
                 zip_file.write(file_path, os.path.relpath(file_path, DOWNLOAD_FOLDER))
 
 
+def get_possible_objects(data_manager):
+    new_objects = data_manager.get_new_objects()
+    filtered = list(filter(lambda x: data_manager.WARNING not in x.types, new_objects))
+
+    print(f"Unprocessed objects: {len(new_objects)}, objects with warnings: {len(new_objects) - len(filtered)}")
+
+    return filtered
+
+
 def main():
     config = load_config()
     data_manager = DataManager(config)
 
-    new_objects = data_manager.get_new_objects()
+    new_objects = get_possible_objects(data_manager)
 
     if not new_objects:
         return
