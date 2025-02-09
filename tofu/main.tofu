@@ -71,7 +71,7 @@ resource "scaleway_job_definition" "playlist-app" {
 
 resource "scaleway_job_definition" "download-app" {
   name         = "download-app"
-  cpu_limit    = 140
+  cpu_limit    = 560
   memory_limit = 512
   image_uri    = "${scaleway_registry_namespace.main.endpoint}/download-app:latest"
   timeout      = "10m"
