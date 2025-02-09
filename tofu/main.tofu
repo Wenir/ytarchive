@@ -1,12 +1,12 @@
 # ---------------------------------------------------------------------------- #
 # s3
 
-resource "scaleway_object_bucket" "main"{
-  name = "${var.glacier_vault_name}-main"
+resource "scaleway_object_bucket" "main" {
+  name   = "${var.glacier_vault_name}-main"
   region = "nl-ams"
 
   lifecycle_rule {
-    id = "archive_id"
+    id      = "archive_id"
     enabled = true
 
     tags = {
@@ -14,13 +14,13 @@ resource "scaleway_object_bucket" "main"{
     }
 
     transition {
-      days = 1
+      days          = 1
       storage_class = "GLACIER"
     }
   }
 
   lifecycle_rule {
-    enabled = true
+    enabled                                = true
     abort_incomplete_multipart_upload_days = 30
   }
 }
@@ -33,33 +33,34 @@ resource "scaleway_iam_application" "job" {
 }
 
 resource "scaleway_iam_api_key" "job_key" {
-  application_id = scaleway_iam_application.job.id
+  application_id     = scaleway_iam_application.job.id
   default_project_id = var.scaleway_project_id
   #description = "a description"
 }
 
-resource scaleway_iam_policy "s3_access" {
-  name = "s3_access"
-  description = "gives app access to object storage in project"
+resource "scaleway_iam_policy" "s3_access" {
+  name           = "s3_access"
+  description    = "gives app access to object storage in project"
   application_id = scaleway_iam_application.job.id
   rule {
-    project_ids = [ var.scaleway_project_id ]
-    permission_set_names = [ "ObjectStorageFullAccess" ]
+    project_ids          = [var.scaleway_project_id]
+    permission_set_names = ["ObjectStorageFullAccess"]
   }
 }
 
 # ---------------------------------------------------------------------------- #
 # jobs
 
-resource "scaleway_job_definition" playlist-app {
-  name = "playlist-app"
-  cpu_limit = 140
+resource "scaleway_job_definition" "playlist-app" {
+  name         = "playlist-app"
+  cpu_limit    = 140
   memory_limit = 512
-  image_uri = "${scaleway_registry_namespace.main.endpoint}/playlist-app:latest"
-  timeout = "10m"
+  image_uri    = "${scaleway_registry_namespace.main.endpoint}/playlist-app:latest"
+  timeout      = "10m"
+  region       = "nl-ams"
 
   env = {
-    foo: "bar"
+    foo : "bar"
   }
 
   cron {
@@ -68,15 +69,16 @@ resource "scaleway_job_definition" playlist-app {
   }
 }
 
-resource "scaleway_job_definition" download-app {
-  name = "download-app"
-  cpu_limit = 140
+resource "scaleway_job_definition" "download-app" {
+  name         = "download-app"
+  cpu_limit    = 140
   memory_limit = 512
-  image_uri = "${scaleway_registry_namespace.main.endpoint}/download-app:latest"
-  timeout = "10m"
+  image_uri    = "${scaleway_registry_namespace.main.endpoint}/download-app:latest"
+  timeout      = "10m"
+  region       = "nl-ams"
 
   env = {
-    foo: "bar"
+    foo : "bar"
   }
 
   cron {
@@ -88,9 +90,11 @@ resource "scaleway_job_definition" download-app {
 resource "scaleway_secret" "job_environment" {
   name        = "job_environment"
   description = "barr"
+  region      = "nl-ams"
 }
 
 resource "scaleway_secret_version" "v1" {
+  region      = "nl-ams"
   description = "version"
   secret_id   = scaleway_secret.job_environment.id
   data        = <<-EOT
@@ -111,6 +115,6 @@ resource "scaleway_secret_version" "v1" {
 # ---------------------------------------------------------------------------- #
 
 output "job-environment" {
-  value = scaleway_secret_version.v1.data
+  value     = scaleway_secret_version.v1.data
   sensitive = true
 }

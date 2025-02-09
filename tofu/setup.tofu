@@ -26,6 +26,7 @@ provider "scaleway" {
   secret_key      = var.scaleway_secret_key
   organization_id = var.scaleway_organization_id
   project_id      = var.scaleway_project_id
+  region          = "nl-ams"
 }
 
 # ---------------------------------------------------------------------------- #
@@ -33,7 +34,7 @@ provider "scaleway" {
 
 resource "scaleway_cockpit_grafana_user" "main" {
   login = "main"
-  role = "editor"
+  role  = "editor"
 }
 
 # ---------------------------------------------------------------------------- #
