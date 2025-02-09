@@ -21,6 +21,16 @@ variable "src_playlist" {
   nullable = false
 }
 
+variable "tg_bot_token" {
+  type = string
+  nullable = false
+}
+
+variable "tg_chat_id" {
+  type = string
+  nullable = false
+}
+
 # ---------------------------------------------------------------------------- #
 # state
 

@@ -42,6 +42,7 @@ class DataManager:
         self.NEW = "new"
         self.ALL = "all"
         self.DONE = "done"
+        self.WARNING = "warning"
 
     def get_objects(self):
         result = {}
@@ -83,6 +84,14 @@ class DataManager:
         )
         self.bucket.put_object(
             Key=f"{self.ALL}/{key.key}",
+            Body=body,
+        )
+
+    def add_warning(self, key: Key, metadata: dict):
+        body = b"".join(self.cryptor.encrypt([json.dumps(metadata).encode()]))
+
+        self.bucket.put_object(
+            Key=f"{self.WARNING}/{key.key}",
             Body=body,
         )
 

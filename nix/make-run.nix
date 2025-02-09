@@ -12,7 +12,7 @@ in
 writeShellApplication {
   name = "${app.name}-run";
   text = ''
-    "${tofu}" output --raw job-environment | base64 -d > .env
+    "${tofu}" output --raw job-environment | base64 -d > .env_tmp
 
     ${lib.getExe app}
   '';

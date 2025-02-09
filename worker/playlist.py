@@ -1,8 +1,10 @@
 import json
 import yt_dlp
+import datetime
 from pprint import pprint
 from pathlib import Path
 
+import notify
 from config import load_config
 from data_manager import DataManager, Key
 
@@ -22,7 +24,7 @@ def get_flat_playlist(playlist_url):
 def format_item(entry):
     item = {}
 
-    for key in "url", "title", "id", "channel", "channel_id", "channel_url":
+    for key in "url", "title", "id", "channel", "channel_id", "channel_url", "duration":
         item[key] = entry[key]
 
     return item
@@ -35,18 +37,33 @@ if __name__ == "__main__":
 
     existing_objects = set(x.key for x in data_manager.get_all_objects())
 
+    warnings = []
+    already_exists = 0
+
     for entry in data["entries"]:
         item = format_item(entry)
 
         key = Key.from_playlist_item(item)
 
         if key in existing_objects:
-            print(f"Item already exists. {item}")
+            already_exists += 1
             continue
+
+        if (item["duration"] or 0) > 600:
+            duration = datetime.timedelta(seconds=item["duration"])
+            warnings.append(f"Item duration is too long.\n{duration}, {item["title"]}, {item["url"]}")
+            data_manager.add_warning(key, item)
 
         data_manager.add_new_object(key, item)
 
         print(f"Item added. {item}")
+
+    print(f"Done, already exists: {already_exists}")
+
+    if warnings:
+        message = "\n".join(warnings)
+        notify.send_message(message, config, with_notification=False)
+
 
     #  'entries': [{'__x_forwarded_for_ip': None,
     #          '_type': 'url',
