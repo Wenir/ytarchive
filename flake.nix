@@ -26,7 +26,11 @@
         make-docker-run = pkgs.callPackage ./nix/make-docker-run.nix {};
         make-run = pkgs.callPackage ./nix/make-run.nix {};
 
-        make_app = app_name: runtimeInputs: rec {
+        make_app = {
+          app_name
+        , runtimeInputs ? []
+        }:
+        rec {
           app = pkgs.callPackage ./nix/app.nix { mypython = python; app_name = app_name; inherit runtimeInputs; };
           image = pkgs.callPackage ./nix/image.nix { app = app; };
           push = make-docker-push { name = app_name + "-app"; image = image; };
@@ -52,8 +56,9 @@
           program = "${pkgs.nix-output-monitor}/bin/nom";
         };
         legacyPackages = rec {
-          playlist = make_app "playlist" [];
-          download = make_app "download" [ pkgs.ffmpeg ];
+          playlist = make_app { app_name = "playlist"; };
+          download = make_app { app_name = "download"; runtimeInputs = [ pkgs.ffmpeg ]; };
+
           decrypt_local = pkgs.callPackage ./nix/app.nix { mypython = python; app_name = "decrypt_local"; };
           #docker-push-playlist = make-docker-push { name = "playlist-app"; image = playlist-image; };
           #docker-run-playlist = make-docker-run { name = "playlist-app"; image = playlist-image; };
