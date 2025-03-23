@@ -38,7 +38,8 @@ def download(url):
         'writedescription': True,
         'writeinfojson': True,
         'writesubtitles': True,
-        'writethumbnail': True
+        'writethumbnail': True,
+        'trim_file_name': True,
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
