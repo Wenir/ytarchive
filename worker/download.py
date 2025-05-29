@@ -39,7 +39,7 @@ def download(url):
         'writeinfojson': True,
         'writesubtitles': True,
         'writethumbnail': True,
-        'trim_file_name': True,
+        'outtmpl': '%(title).150B [%(id)s].%(ext)s',
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -98,6 +98,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    #download("https://www.youtube.com/watch?v=MV9KPhbpAjI")
 
     # keys = ["url", "title", "id", "channel", "channel_id", "channel_url"]
 
