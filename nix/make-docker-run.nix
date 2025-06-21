@@ -15,6 +15,7 @@ in
 writeShellApplication {
   name = "docker-run-${name}";
   text = ''
+    cd tofu
     "${tofu}" output --raw job-environment | base64 -d > .env_tmp
 
     ${lib.getExe skopeo} \

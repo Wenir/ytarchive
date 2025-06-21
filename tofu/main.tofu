@@ -59,8 +59,9 @@ resource "scaleway_job_definition" "playlist-app" {
   timeout      = "10m"
   region       = "nl-ams"
 
-  env = {
-    foo : "bar"
+  secret_reference {
+    secret_id      = scaleway_secret.job_environment.id
+    file           = "/.env"
   }
 
   cron {
@@ -77,8 +78,9 @@ resource "scaleway_job_definition" "download-app" {
   timeout      = "10m"
   region       = "nl-ams"
 
-  env = {
-    foo : "bar"
+  secret_reference {
+    secret_id      = scaleway_secret.job_environment.id
+    file           = "/.env"
   }
 
   cron {

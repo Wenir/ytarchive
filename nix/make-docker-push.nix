@@ -14,6 +14,7 @@ in
 writeShellApplication {
   name = "docker-push-${name}";
   text = ''
+    cd tofu
     endpoint="$("${tofu}" output --raw registry-endpoint)"
     key="$("${tofu}" output --raw registry-key)"
 

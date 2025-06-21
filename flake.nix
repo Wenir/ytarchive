@@ -51,10 +51,6 @@
           type = "app";
           program = "${pkgs.opentofu}/bin/tofu";
         };
-        apps.nom = {
-          type = "app";
-          program = "${pkgs.nix-output-monitor}/bin/nom";
-        };
         legacyPackages = rec {
           playlist = make_app { app_name = "playlist"; };
           download = make_app { app_name = "download"; runtimeInputs = [ pkgs.ffmpeg ]; };
