@@ -4,9 +4,9 @@ import datetime
 from pprint import pprint
 from pathlib import Path
 
-import notify
-from config import load_config
-from data_manager import DataManager, Key
+import ytarchive_lib.notify as notify
+from ytarchive_lib.config import load_config
+from ytarchive_lib.data_manager import DataManager, Key
 
 
 def get_flat_playlist(playlist_url):
@@ -45,7 +45,7 @@ def add_warning(key, item):
         return f"Item duration is too long.\n{duration}, {item["title"]}, {item["url"]}"
 
 
-if __name__ == "__main__":
+def main():
     config = load_config()
     data = get_flat_playlist(config["SRC_PLAYLIST"])
     data_manager = DataManager(config)
@@ -78,6 +78,9 @@ if __name__ == "__main__":
     if warnings:
         message = "\n".join(warnings)
         notify.send_message(message, config, with_notification=False)
+
+if __name__ == "__main__":
+    main()
 
 
     #  'entries': [{'__x_forwarded_for_ip': None,

@@ -4,13 +4,13 @@
 , opentofu
 , lib
 }:
+let
+  tofu = "${lib.getExe opentofu}";
+in
 {
   name
 , image
 }:
-let
-  tofu = "${lib.getExe opentofu}";
-in
 writeShellApplication {
   name = "docker-push-${name}";
   text = ''

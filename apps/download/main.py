@@ -8,8 +8,8 @@ from pprint import pprint
 from pathlib import Path
 
 
-from config import load_config
-from data_manager import DataManager, Key
+from ytarchive_lib.config import load_config
+from ytarchive_lib.data_manager import DataManager, Key
 
 DOWNLOAD_FOLDER = "/tmp/ytarchive"
 

@@ -1,0 +1,10 @@
+[project]
+name = "ytarchive-lib"
+version = "1.0.0"
+description = "Library for ytarchive project"
+requires-python = ">=3.8"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "download"
+version = "1.0.0"
+description = "Download"
+readme = ""
+requires-python = ">=3.7"
+dependencies = []
+
+[project.scripts]
+download = "main:main"

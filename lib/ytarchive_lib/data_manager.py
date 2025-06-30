@@ -7,8 +7,8 @@ from dataclasses import dataclass
 from collections import defaultdict
 from typing import BinaryIO
 
-import crypt
-from utils import hash_string
+from .crypt import Crypt
+from .utils import hash_string
 
 
 @dataclass(frozen=True)
@@ -34,7 +34,7 @@ class DataManager:
     def __init__(self, config):
         self.s3 = self._create_s3_client(config)
         self.bucket = self.s3.Bucket(config["BUCKET_NAME"])
-        self.cryptor = crypt.Crypt(
+        self.cryptor = Crypt(
             bytes.fromhex(config["DATA_KEY"]),
             bytes.fromhex(config["DATA_IV"]),
         )

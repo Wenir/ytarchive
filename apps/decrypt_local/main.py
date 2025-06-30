@@ -1,6 +1,6 @@
 import os
 import argparse
-from crypt import Crypt
+from ytarchive_lib.crypt import Crypt
 
 
 def parse_args():
@@ -12,7 +12,7 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def main():
     key = bytes.fromhex(os.environ["TF_VAR_data_key"])
     iv = bytes.fromhex(os.environ["TF_VAR_data_iv"])
 
@@ -28,3 +28,7 @@ if __name__ == "__main__":
 
         for chunk in decrypted_data:
             args.output.write(chunk)
+
+
+if __name__ == "__main__":
+    main()

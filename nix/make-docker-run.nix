@@ -4,26 +4,29 @@
 , podman
 , opentofu
 , lib
+, make-run
 }:
+let
+  tofu = "${lib.getExe opentofu}";
+in
 {
   name
 , image
 }:
 let
-  tofu = "${lib.getExe opentofu}";
+  app = writeShellApplication {
+    name = "docker-run-${name}";
+    text = ''
+      ${lib.getExe skopeo} \
+          --insecure-policy \
+          copy \
+          "docker-archive://${image}" \
+          "containers-storage:${name}:latest"
+
+      "${lib.getExe podman}" run --rm -it -v "$ENV_FILE:/.env" ${name}:latest
+    '';
+  };
 in
-writeShellApplication {
-  name = "docker-run-${name}";
-  text = ''
-    cd tofu
-    "${tofu}" output --raw job-environment | base64 -d > .env_tmp
-
-    ${lib.getExe skopeo} \
-        --insecure-policy \
-        copy \
-        "docker-archive://${image}" \
-        "containers-storage:${name}:latest"
-
-    "${lib.getExe podman}" run --rm -it -v "$PWD/.env_tmp:/.env" ${name}:latest
-  '';
+make-run {
+  inherit app;
 }

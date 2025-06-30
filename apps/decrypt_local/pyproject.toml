@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "decrypt_local"
+version = "1.0.0"
+description = "Decrypt local"
+readme = ""
+requires-python = ">=3.7"
+dependencies = []
+
+[project.scripts]
+decrypt_local = "main:main"

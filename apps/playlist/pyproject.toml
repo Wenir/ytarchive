@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "playlist"
+version = "1.0.0"
+description = "Playlist"
+readme = ""
+requires-python = ">=3.7"
+dependencies = []
+
+[project.scripts]
+playlist = "main:main"

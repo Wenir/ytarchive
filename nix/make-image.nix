@@ -3,7 +3,6 @@
 , buildEnv
 , coreutils
 , lib
-, app
 , writeShellApplication
 }:
 let
@@ -16,6 +15,11 @@ let
       coreutils
     ];
   };
+in
+{
+  app
+}:
+let
   cmd = writeShellApplication {
     name = "${app.name}-docker-cmd";
     text = ''
