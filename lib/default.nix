@@ -4,6 +4,7 @@
 , boto3
 , cryptography
 , to_file_like_obj
+, python-dotenv
 }:
 buildPythonPackage {
   pname = "ytarchive-lib";
@@ -21,6 +22,7 @@ buildPythonPackage {
     boto3
     to_file_like_obj
     cryptography
+    python-dotenv
   ];
 
   doCheck = false;

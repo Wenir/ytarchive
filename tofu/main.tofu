@@ -104,6 +104,7 @@ resource "scaleway_secret_version" "v1" {
     SECRET_KEY="${scaleway_iam_api_key.job_key.secret_key}"
     BUCKET_ENDPOINT="${scaleway_object_bucket.main.endpoint}"
     BUCKET_NAME="${scaleway_object_bucket.main.name}"
+    TESTS_BUCKET_NAME="${scaleway_object_bucket.tests.name}"
     REGION="${scaleway_object_bucket.main.region}"
     API_ENDPOINT="${scaleway_object_bucket.main.api_endpoint}"
     DATA_KEY="${var.data_key}"

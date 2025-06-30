@@ -14,7 +14,6 @@
 
         python-libs = ps: [
           ps.yt-dlp
-          ps.python-dotenv
           ps.cryptography
           ps.boto3
           ps.to_file_like_obj
@@ -36,10 +35,14 @@
             runtimeInputs = [ pkgs.ffmpeg ];
           };
 
-          decrypt_local = pkgs.make-app {
-            app_name = "decrypt_local";
-            propagatedBuildInputs = python-libs pkgs.python3Packages;
+          decrypt_local = pkgs.make-run {
+            app = pkgs.make-app {
+              app_name = "decrypt_local";
+              propagatedBuildInputs = python-libs pkgs.python3Packages;
+            };
           };
+
+          tests = pkgs.make-run { app = pkgs.python3Packages.callPackage ./tests {}; };
 
           pushall = pkgs.writeShellApplication {
             name = "pushall";
@@ -73,7 +76,6 @@
           #      --env DATA_IV="$DATA_IV" \
           #      --workdir /work   main_docker:latest
           #'';
-        
 
         #main = pkgs.writeShellApplication {
         #  name = "main";
