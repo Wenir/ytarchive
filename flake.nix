@@ -42,7 +42,7 @@
             };
           };
 
-          tests = pkgs.make-run { app = pkgs.python3Packages.callPackage ./tests {}; };
+          tests = pkgs.make-run { app = pkgs.callPackage ./tests {}; };
 
           pushall = pkgs.writeShellApplication {
             name = "pushall";

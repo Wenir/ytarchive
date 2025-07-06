@@ -1,41 +1,19 @@
 {
-  buildPythonApplication
-, setuptools
-, wheel
-, pytest
-, shortuuid
-, ytarchive_lib
+  python3
 , writeShellApplication
-, lib
 }:
 let
-  app = buildPythonApplication {
-    meta.mainProgram = "tests";
-    pname = "tests";
-
-    version = "1.0.0";
-    pyproject = true;
-
-    src = ./.;
-
-    nativeBuildInputs = [
-      setuptools
-      wheel
-    ];
-
-    propagatedBuildInputs = [
-      pytest
-      ytarchive_lib
-      shortuuid
-    ];
-
-    doCheck = false;
-  };
+  python = python3.withPackages (ps: [
+    ps.pytest
+    ps.ytarchive_lib
+    ps.shortuuid
+  ]);
 in
 writeShellApplication {
   name = "tests";
+  runtimeInputs = [ python ];
   text = ''
     cd ${./tests}
-    exec ${lib.getExe app} "$@"
+    exec pytest "$@"
   '';
 }
