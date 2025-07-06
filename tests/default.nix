@@ -3,6 +3,7 @@
 , setuptools
 , wheel
 , pytest
+, shortuuid
 , ytarchive_lib
 , writeShellApplication
 , lib
@@ -22,7 +23,11 @@ let
       wheel
     ];
 
-    propagatedBuildInputs = [ pytest ytarchive_lib ];
+    propagatedBuildInputs = [
+      pytest
+      ytarchive_lib
+      shortuuid
+    ];
 
     doCheck = false;
   };
