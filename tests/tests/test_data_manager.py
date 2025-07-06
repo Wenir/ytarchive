@@ -5,6 +5,12 @@ import ytarchive_lib.config as config
 from conftest import generate_id
 
 
+# Enable bucket cleanup for all tests in this file
+@pytest.fixture(scope="function", autouse=True)
+def enable_bucket_cleanup(bucket_cleanup):
+    yield
+
+
 def test_add():
     data_manager = dm.DataManager(config.load_config())
 

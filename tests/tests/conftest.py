@@ -4,6 +4,28 @@ import logging
 import ytarchive_lib.data_manager as dm
 import ytarchive_lib.config as config
 import shortuuid
+import contextlib
+from filelock import FileLock
+
+
+class TestBucketLock:
+    def __init__(self, tmp_path_factory, name: str = "main", timeout: float = 30.0):
+        run_uid = os.environ.get('PYTEST_XDIST_TESTRUNUID')
+        directory = tmp_path_factory.getbasetemp()
+        if run_uid:
+            directory = directory.parent
+        else:
+            run_uid = "local"
+        filename = f"rpp_shared_data.{run_uid}.{name}.json"
+
+        self.shared_file = directory / filename
+        self.lock_file = self.shared_file.parent / (self.shared_file.name + '.lock')
+
+
+    @contextlib.contextmanager
+    def lock(self):
+        with FileLock(self.lock_file) as lock:
+            yield lock
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -42,13 +64,14 @@ def delete_all(data_manager):
     logging.info(data_manager.get_objects())
 
 
-@pytest.fixture(scope="function", autouse=True)
-def cleanup(data_manager):
-    delete_all(data_manager)
+@pytest.fixture(scope="function")
+def bucket_cleanup(data_manager, tmp_path_factory):
+    with TestBucketLock(tmp_path_factory).lock():
+        delete_all(data_manager)
 
-    yield
+        yield
 
-    delete_all(data_manager)
+        delete_all(data_manager)
 
 
 
