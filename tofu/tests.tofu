@@ -13,7 +13,7 @@ resource "scaleway_object_bucket" "tests" {
   lifecycle_rule {
     enabled = true
     expiration {
-        days = "2"
+      days = "2"
     }
   }
 }

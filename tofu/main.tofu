@@ -1,31 +1,4 @@
 # ---------------------------------------------------------------------------- #
-# s3
-
-resource "scaleway_object_bucket" "main" {
-  name   = "${var.glacier_vault_name}-main"
-  region = "nl-ams"
-
-  lifecycle_rule {
-    id      = "archive_id"
-    enabled = true
-
-    tags = {
-      "archive" = "true"
-    }
-
-    transition {
-      days          = 1
-      storage_class = "GLACIER"
-    }
-  }
-
-  lifecycle_rule {
-    enabled                                = true
-    abort_incomplete_multipart_upload_days = 30
-  }
-}
-
-# ---------------------------------------------------------------------------- #
 # job user
 
 resource "scaleway_iam_application" "job" {
@@ -36,16 +9,6 @@ resource "scaleway_iam_api_key" "job_key" {
   application_id     = scaleway_iam_application.job.id
   default_project_id = var.scaleway_project_id
   #description = "a description"
-}
-
-resource "scaleway_iam_policy" "s3_access" {
-  name           = "s3_access"
-  description    = "gives app access to object storage in project"
-  application_id = scaleway_iam_application.job.id
-  rule {
-    project_ids          = [var.scaleway_project_id]
-    permission_set_names = ["ObjectStorageFullAccess"]
-  }
 }
 
 # ---------------------------------------------------------------------------- #
@@ -60,8 +23,8 @@ resource "scaleway_job_definition" "playlist-app" {
   region       = "nl-ams"
 
   secret_reference {
-    secret_id      = scaleway_secret.job_environment.id
-    file           = "/.env"
+    secret_id = scaleway_secret.job_environment.id
+    file      = "/.env"
   }
 
   cron {
@@ -79,8 +42,8 @@ resource "scaleway_job_definition" "download-app" {
   region       = "nl-ams"
 
   secret_reference {
-    secret_id      = scaleway_secret.job_environment.id
-    file           = "/.env"
+    secret_id = scaleway_secret.job_environment.id
+    file      = "/.env"
   }
 
   cron {
@@ -107,6 +70,7 @@ resource "scaleway_secret_version" "v1" {
     TESTS_BUCKET_NAME="${scaleway_object_bucket.tests.name}"
     REGION="${scaleway_object_bucket.main.region}"
     API_ENDPOINT="${scaleway_object_bucket.main.api_endpoint}"
+    DB_ASSESS="${local.database_connection_string}"
     DATA_KEY="${var.data_key}"
     DATA_IV="${var.data_iv}"
     SRC_PLAYLIST="${var.src_playlist}"
