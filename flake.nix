@@ -53,7 +53,7 @@
           };
         };
 
-        devShells.default = pkgs.mkShell { packages = [ python pkgs.ffmpeg ]; };
+        devShells.default = pkgs.mkShell { packages = [ python pkgs.ffmpeg pkgs.grafana-loki ]; };
         apps.tofu = { type = "app"; program = "${pkgs.opentofu}/bin/tofu"; };
       });
 }
