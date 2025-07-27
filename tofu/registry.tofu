@@ -1,6 +1,6 @@
 
 resource "scaleway_registry_namespace" "main" {
-  name        = "main-${var.glacier_vault_name}"
+  name        = "main-${var.prefix_name}"
   description = "Main container registry"
   is_public   = false
   region      = "nl-ams"

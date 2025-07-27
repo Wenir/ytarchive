@@ -31,11 +31,13 @@ class TestBucketLock:
 @pytest.fixture(scope="module", autouse=True)
 def autofixture():
     os.environ["BUCKET_NAME"] = os.environ["TESTS_BUCKET_NAME"]
+    os.environ["DB_ACCESS"] = os.environ["TESTS_DB_ACCESS"]
 
 
 @pytest.fixture(scope="function", autouse=False)
 def data_manager():
     assert "main" not in os.environ["BUCKET_NAME"]
+    assert "main" not in os.environ["DB_ACCESS"]
 
     return dm.DataManager(config.load_config())
 

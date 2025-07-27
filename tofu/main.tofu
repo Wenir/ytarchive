@@ -52,6 +52,9 @@ resource "scaleway_job_definition" "download-app" {
   }
 }
 
+# ---------------------------------------------------------------------------- #
+# secret
+
 resource "scaleway_secret" "job_environment" {
   name        = "job_environment"
   description = "barr"
@@ -70,7 +73,8 @@ resource "scaleway_secret_version" "v1" {
     TESTS_BUCKET_NAME="${scaleway_object_bucket.tests.name}"
     REGION="${scaleway_object_bucket.main.region}"
     API_ENDPOINT="${scaleway_object_bucket.main.api_endpoint}"
-    DB_ASSESS="${local.database_connection_string}"
+    DB_ACCESS="${local.database_connection_string}"
+    TESTS_DB_ACCESS="${local.tests_database_connection_string}"
     DATA_KEY="${var.data_key}"
     DATA_IV="${var.data_iv}"
     SRC_PLAYLIST="${var.src_playlist}"

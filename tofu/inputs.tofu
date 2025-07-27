@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------- #
 # app
 
-variable "glacier_vault_name" {
+variable "prefix_name" {
   type     = string
   nullable = false
 }
