@@ -43,7 +43,7 @@ class Crypt:
 
         decryptor = Cipher(self.algorithm, modes.GCM(nonce)).decryptor()
 
-        for chunk in suffix.data:
+        for chunk in suffix.rest:
             assert isinstance(chunk, bytes)
             yield decryptor.update(chunk)
 
@@ -61,7 +61,7 @@ class Crypt:
             assert isinstance(chunk, bytes)
             buffer += chunk
 
-        first_8, remainder = buffer[:size], buffer[size:]
+        prefix, remainder = buffer[:size], buffer[size:]
 
         def rest():
             if remainder:
@@ -69,13 +69,13 @@ class Crypt:
 
             yield from it
 
-        return first_8, rest()
+        return prefix, rest()
 
 
     def _get_suffix(self, size: int, data: Iterable[bytes]):
         @dataclass
         class Result:
-            data: Generator = None
+            rest: Generator = None
             suffix: bytes = b""
             window: list[bytes] = field(default_factory=list)
 
@@ -109,7 +109,7 @@ class Crypt:
             if len(result.suffix) < size:
                 raise ValueError(f"Not enough data to read {size} bytes")
 
-        result.data = process_stream()
+        result.rest = process_stream()
         return result
 
 

@@ -72,11 +72,11 @@ def test_get_suffix(crypt, sizes):
     if len(joined) < 8:
         with pytest.raises(ValueError, match="Not enough data to read 8 bytes"):
             result = crypt._get_suffix(8, data)
-            joined_result = b"".join(result.data)
+            joined_result = b"".join(result.rest)
 
     else:
         result = crypt._get_suffix(8, data)
-        res = list(result.data)
+        res = list(result.rest)
         joined_result = b"".join(res)
 
         assert joined_result == joined[:-8]
