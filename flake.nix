@@ -32,7 +32,7 @@
           download = pkgs.make-bundle {
             app_name = "download";
             inherit python-libs;
-            runtimeInputs = [ pkgs.ffmpeg ];
+            runtimeInputs = [ pkgs.ffmpeg pkgs.deno ];
           };
 
           decrypt_local = pkgs.make-run {
@@ -53,7 +53,7 @@
           };
         };
 
-        devShells.default = pkgs.mkShell { packages = [ python pkgs.ffmpeg pkgs.grafana-loki ]; };
+        devShells.default = pkgs.mkShell { packages = [ python pkgs.ffmpeg pkgs.deno pkgs.grafana-loki ]; };
         apps.tofu = { type = "app"; program = "${pkgs.opentofu}/bin/tofu"; };
       });
 }
