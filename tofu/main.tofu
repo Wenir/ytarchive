@@ -47,7 +47,7 @@ resource "scaleway_job_definition" "download-app" {
   }
 
   cron {
-    schedule = "1 1 * * *"
+    schedule = "0 */6 * * *"
     timezone = "UTC"
   }
 }
