@@ -78,6 +78,7 @@ resource "scaleway_secret_version" "v1" {
     DATA_KEY="${var.data_key}"
     DATA_IV="${var.data_iv}"
     SRC_PLAYLIST="${var.src_playlist}"
+    TESTS_SRC_PLAYLIST="${var.tests_src_playlist}"
     TG_BOT_TOKEN="${var.tg_bot_token}"
     TG_CHAT_ID="${var.tg_chat_id}"
     EOT

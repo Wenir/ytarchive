@@ -13,11 +13,12 @@
         };
 
         python-libs = ps: [
-          ps.yt-dlp
-          ps.cryptography
-          ps.boto3
-          ps.to_file_like_obj
+          #ps.yt-dlp
+          #ps.cryptography
+          #ps.boto3
+          #ps.to_file_like_obj
           ps.ytarchive_lib
+          #ps.psycopg
         ];
 
         python = pkgs.python3.withPackages python-libs;

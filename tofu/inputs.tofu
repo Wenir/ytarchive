@@ -21,6 +21,11 @@ variable "src_playlist" {
   nullable = false
 }
 
+variable "tests_src_playlist" {
+  type     = string
+  nullable = false
+}
+
 variable "tg_bot_token" {
   type     = string
   nullable = false

@@ -5,10 +5,12 @@
 let
   python = python3.withPackages (ps: [
     ps.pytest
-    ps.pytest_xdist
+    ps.pytest-asyncio
+    ps.pytest-xdist
     ps.ytarchive_lib
     ps.shortuuid
     ps.filelock
+    ps.psycopg
   ]);
 in
 writeShellApplication {
@@ -16,6 +18,6 @@ writeShellApplication {
   runtimeInputs = [ python ];
   text = ''
     cd ${./tests}
-    exec pytest -n auto "$@"
+    exec pytest "$@"
   '';
 }
