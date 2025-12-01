@@ -36,7 +36,7 @@ resource "scaleway_job_definition" "playlist-app" {
 resource "scaleway_job_definition" "download-app" {
   name         = "download-app"
   cpu_limit    = 560
-  memory_limit = 1024
+  memory_limit = 2048
   image_uri    = "${scaleway_registry_namespace.main.endpoint}/download-app:latest"
   timeout      = "10m"
   region       = "nl-ams"
@@ -47,7 +47,7 @@ resource "scaleway_job_definition" "download-app" {
   }
 
   cron {
-    schedule = "0 */6 * * *"
+    schedule = "0 */1 * * *"
     timezone = "UTC"
   }
 }
