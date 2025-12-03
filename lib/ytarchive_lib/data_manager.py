@@ -92,6 +92,22 @@ class Warning:
             await connection.commit()
 
 
+@dataclass
+class Playlist:
+    url: str
+
+    @classmethod
+    async def setup_db(cls, connection: psycopg.Connection):
+        async with connection.cursor() as cursor:
+            await cursor.execute("""
+                CREATE TABLE IF NOT EXISTS playlists (
+                    url          TEXT NOT NULL,
+                    PRIMARY KEY (url)
+                );
+            """)
+            await connection.commit()
+
+
 class DataManager:
     @classmethod
     async def create(cls, config):
@@ -119,6 +135,7 @@ class DataManager:
     async def _init(self):
         await SrcItem.setup_db(self.db.connection)
         await Warning.setup_db(self.db.connection)
+        await Playlist.setup_db(self.db.connection)
 
     async def add_src_item(self, item: SrcItem):
         async with self.db.connection.cursor() as cursor:
@@ -163,6 +180,28 @@ class DataManager:
             inserted = await cursor.fetchone()
             await self.db.connection.commit()
             return inserted is not None
+
+    async def add_playlist(self, playlist: Playlist):
+        async with self.db.connection.cursor() as cursor:
+            await cursor.execute("""
+                INSERT INTO playlists (url)
+                VALUES (%s)
+                ON CONFLICT (url) DO NOTHING
+                RETURNING 1;
+            """, (playlist.url,))
+
+            inserted = await cursor.fetchone()
+            await self.db.connection.commit()
+            return inserted is not None
+
+    async def get_playlists(self):
+        async with self.db.connection.cursor() as cursor:
+            await cursor.execute("""
+                SELECT url FROM playlists;
+            """)
+
+            async for row in cursor:
+                yield Playlist(url=row[0])
 
     async def get_src_items_by_state(self, state: SrcItem.State):
         async with self.db.connection.cursor() as cursor:

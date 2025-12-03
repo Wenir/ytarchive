@@ -79,3 +79,59 @@ def test_upload_file(data_manager):
     returned_file = b"".join(data_manager.download_file("youtube", "TESTKEY"))
 
     assert returned_file == test_data
+
+
+async def test_add_playlist(data_manager):
+    playlist = dm.Playlist(url="https://www.youtube.com/playlist?list=PLs6f7LuYcgtn1IeWz1is9AXZd46F4V6qu")
+
+    inserted = await data_manager.add_playlist(playlist)
+
+    assert inserted is True
+
+    playlists = []
+    async for p in data_manager.get_playlists():
+        playlists.append(p)
+
+    assert playlists == [playlist]
+
+
+async def test_add_duplicate_playlist(data_manager):
+    playlist = dm.Playlist(url="https://www.youtube.com/playlist?list=PLs6f7LuYcgtn1IeWz1is9AXZd46F4V6qu")
+
+    first_insert = await data_manager.add_playlist(playlist)
+    assert first_insert is True
+
+    second_insert = await data_manager.add_playlist(playlist)
+    assert second_insert is False
+
+    playlists = []
+    async for p in data_manager.get_playlists():
+        playlists.append(p)
+
+    assert len(playlists) == 1
+    assert playlists == [playlist]
+
+
+async def test_add_multiple_playlists(data_manager):
+    playlist1 = dm.Playlist(url="https://www.youtube.com/playlist?list=PLs6f7LuYcgtn1IeWz1is9AXZd46F4V6qu")
+    playlist2 = dm.Playlist(url="https://www.youtube.com/playlist?list=PL2222LuYcgtn1IeWz1is9AXZd46F42222")
+    playlist3 = dm.Playlist(url="https://www.youtube.com/playlist?list=PL3333LuYcgtn1IeWz1is9AXZd46F43333")
+
+    await data_manager.add_playlist(playlist1)
+    await data_manager.add_playlist(playlist2)
+    await data_manager.add_playlist(playlist3)
+
+    playlists = []
+    async for p in data_manager.get_playlists():
+        playlists.append(p)
+
+    assert len(playlists) == 3
+    assert set(p.url for p in playlists) == {playlist1.url, playlist2.url, playlist3.url}
+
+
+async def test_get_playlists_empty(data_manager):
+    playlists = []
+    async for p in data_manager.get_playlists():
+        playlists.append(p)
+
+    assert playlists == []

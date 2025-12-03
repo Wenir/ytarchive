@@ -8,7 +8,7 @@ from pathlib import Path
 
 import ytarchive_lib.notify as notify
 from ytarchive_lib.config import load_config
-from ytarchive_lib.data_manager import DataManager, SrcItem, Warning
+from ytarchive_lib.data_manager import DataManager, SrcItem, Warning, Playlist
 
 
 def get_flat_playlist(playlist_url):
@@ -67,30 +67,35 @@ async def amain():
     #    "channel_url": "https://www.youtube.com/channel/UCl9OJE9OpXui-gRsnWjSrlA",
     #    "duration": 93
     #}]}
-    data = get_flat_playlist(config["SRC_PLAYLIST"])
-
     async with await DataManager.create(config) as data_manager:
-        warnings = []
+        await data_manager.add_playlist(Playlist(url=config["SRC_PLAYLIST"]))
 
-        async def process_entry(entry):
-            item = make_item(entry)
+        async for playlist in data_manager.get_playlists():
+            logging.info(f"Processing playlist: {playlist.url}")
 
-            warning = detect_warnings(item)
-            if warning:
-                item.state = SrcItem.State.WARNING
+            data = get_flat_playlist(playlist.url)
 
-            added = await data_manager.add_src_item(item)
+            warnings = []
 
-            if not added:
-                return
+            async def process_entry(entry):
+                item = make_item(entry)
 
-            if warning:
-                await data_manager.add_warning(warning)
-                warnings.append(warning.message)
+                warning = detect_warnings(item)
+                if warning:
+                    item.state = SrcItem.State.WARNING
 
-            logging.info(f"Item added. {item=}, {warning=}")
+                added = await data_manager.add_src_item(item)
 
-        await asyncio.gather(*[process_entry(entry) for entry in data["entries"]])
+                if not added:
+                    return
+
+                if warning:
+                    await data_manager.add_warning(warning)
+                    warnings.append(warning.message)
+
+                logging.info(f"Item added. {item=}, {warning=}")
+
+            await asyncio.gather(*[process_entry(entry) for entry in data["entries"]])
 
         logging.info("Done")
 
