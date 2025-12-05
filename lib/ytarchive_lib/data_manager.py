@@ -1,5 +1,6 @@
 import json
 import boto3
+import logging
 from botocore.exceptions import ClientError
 from to_file_like_obj import to_file_like_obj
 from enum import StrEnum, auto
@@ -248,14 +249,15 @@ class DataManager:
         encrypted = to_file_like_obj(self.cryptor.encrypt(gen()))
 
         key = hash_string(f"{provider}:{id}")
+        logging.info(f"Uploading file to archive/{key}")
 
         obj = self.bucket.Object(f"archive/{key}")
 
         res = obj.upload_fileobj(encrypted, ExtraArgs={"Tagging": "archive=true"})
-        print(f"Uploaded to bucket with status {res}")
+        logging.info(f"Uploaded to bucket with status {res}")
 
         res = obj.wait_until_exists()
-        print(f"Wait status {res}")
+        logging.info(f"Wait status {res}")
 
     def download_file(self, provider: str, id: str) -> BinaryIO:
         key = hash_string(f"{provider}:{id}")
