@@ -43,6 +43,13 @@
             };
           };
 
+          warnings = pkgs.make-run {
+            app = pkgs.make-app {
+              app_name = "warnings";
+              propagatedBuildInputs = python-libs pkgs.python3Packages;
+            };
+          };
+
           tests = pkgs.make-run { app = pkgs.callPackage ./tests {}; };
 
           pushall = pkgs.writeShellApplication {

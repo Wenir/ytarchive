@@ -10,6 +10,7 @@ from collections import defaultdict
 from typing import BinaryIO
 import contextlib
 import psycopg
+from psycopg.rows import dict_row
 
 from .crypt_v2 import Crypt
 from .utils import hash_string
@@ -196,16 +197,16 @@ class DataManager:
             return inserted is not None
 
     async def get_playlists(self):
-        async with self.db.connection.cursor() as cursor:
+        async with self.db.connection.cursor(row_factory=dict_row) as cursor:
             await cursor.execute("""
                 SELECT url FROM playlists;
             """)
 
             async for row in cursor:
-                yield Playlist(url=row[0])
+                yield Playlist(url=row['url'])
 
     async def get_src_items_by_state(self, state: SrcItem.State):
-        async with self.db.connection.cursor() as cursor:
+        async with self.db.connection.cursor(row_factory=dict_row) as cursor:
             await cursor.execute("""
                 SELECT provider, id, url, title, channel, channel_id, channel_url, duration, state, priority
                 FROM src_items
@@ -214,18 +215,7 @@ class DataManager:
             """, (str(state),))
 
             async for row in cursor:
-                yield SrcItem(
-                    provider=row[0],
-                    id=row[1],
-                    url=row[2],
-                    title=row[3],
-                    channel=row[4],
-                    channel_id=row[5],
-                    channel_url=row[6],
-                    duration=row[7],
-                    state=SrcItem.State(row[8]),
-                    priority=row[9],
-                )
+                yield self._create_src_item(row)
 
     async def mark_as_done(self, provider: str, id: str):
         async with self.db.connection.cursor() as cursor:
@@ -235,6 +225,68 @@ class DataManager:
                 WHERE provider = %s AND id = %s;
             """, (
                 str(SrcItem.State.DONE),
+                provider,
+                id,
+            ))
+
+            await self.db.connection.commit()
+
+    async def get_warnings(self, state: Warning.State = None):
+        """Get warnings with associated src_item data"""
+        async with self.db.connection.cursor(row_factory=dict_row) as cursor:
+            query = """
+                SELECT
+                    w.provider as w_provider, w.id as w_id, w.warning_id, w.message, w.state as w_state,
+                    s.provider, s.id, s.url, s.title, s.channel, s.channel_id, s.channel_url,
+                    s.duration, s.state, s.priority
+                FROM warnings as w
+                LEFT JOIN src_items as s ON w.provider = s.provider AND w.id = s.id
+            """
+            params = []
+
+            if state is not None:
+                query += " WHERE w.state = %s"
+                params.append(str(state))
+
+            query += " ORDER BY w.provider, w.id"
+
+            await cursor.execute(query, params)
+
+            async for row in cursor:
+                warning = Warning(
+                    provider=row['w_provider'],
+                    id=row['w_id'],
+                    warning_id=row['warning_id'],
+                    message=row['message'],
+                    state=Warning.State(row['w_state']),
+                )
+
+                src_item = None
+                if row['url'] is not None:
+                    src_item = self._create_src_item(row)
+
+                yield (warning, src_item)
+
+    async def clear_warning(self, provider: str, id: str):
+        """Clear a warning by marking src_item as NEW and warning as OVERRIDDEN"""
+        async with self.db.connection.cursor() as cursor:
+            await cursor.execute("""
+                UPDATE src_items
+                SET state = %s
+                WHERE provider = %s AND id = %s AND state = %s;
+            """, (
+                str(SrcItem.State.NEW),
+                provider,
+                id,
+                str(SrcItem.State.WARNING),
+            ))
+
+            await cursor.execute("""
+                UPDATE warnings
+                SET state = %s
+                WHERE provider = %s AND id = %s;
+            """, (
+                str(Warning.State.OVERRIDDEN),
                 provider,
                 id,
             ))
@@ -282,3 +334,17 @@ class DataManager:
         )
 
         return resource
+
+    def _create_src_item(self, row) -> SrcItem:
+        return SrcItem(
+            provider=row['provider'],
+            id=row['id'],
+            url=row['url'],
+            title=row['title'],
+            channel=row['channel'],
+            channel_id=row['channel_id'],
+            channel_url=row['channel_url'],
+            duration=row['duration'],
+            state=SrcItem.State(row['state']),
+            priority=row['priority'],
+        )

@@ -7,6 +7,7 @@
 , to_file_like_obj
 , python-dotenv
 , psycopg
+, pyyaml
 }:
 buildPythonPackage {
   pname = "ytarchive-lib";
@@ -27,6 +28,7 @@ buildPythonPackage {
     cryptography
     python-dotenv
     psycopg
+    pyyaml
   ];
 
   doCheck = false;

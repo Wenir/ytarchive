@@ -5,6 +5,7 @@ import ytarchive_lib.data_manager as dm
 import ytarchive_lib.config as config
 import shortuuid
 import contextlib
+from psycopg.rows import dict_row
 from filelock import FileLock
 
 
@@ -143,7 +144,7 @@ async def check_items(data_manager, expected):
 
 
 async def check_warnings(data_manager, expected):
-    async with data_manager.db.connection.cursor() as cursor:
+    async with data_manager.db.connection.cursor(row_factory=dict_row) as cursor:
         await cursor.execute("""
             SELECT provider, id, warning_id, message, state
             FROM warnings
@@ -154,11 +155,11 @@ async def check_warnings(data_manager, expected):
         async for row in cursor:
             actual_warnings.append(
                 dm.Warning(
-                    provider=row[0],
-                    id=row[1],
-                    warning_id=row[2],
-                    message=row[3],
-                    state=dm.Warning.State(row[4]),
+                    provider=row['provider'],
+                    id=row['id'],
+                    warning_id=row['warning_id'],
+                    message=row['message'],
+                    state=dm.Warning.State(row['state']),
                 )
             )
 
