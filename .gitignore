@@ -6,3 +6,8 @@ tofu/.env_tmp
 .direnv
 result
 .files.zip
+main.session.sql
+CLAUDE.md
+tests.session.sql
+test.yml
+.vscode/settings.json
