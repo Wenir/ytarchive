@@ -110,6 +110,30 @@ class Playlist:
             await connection.commit()
 
 
+@dataclass
+class VideoMetadata:
+    provider: str
+    id: str
+    chapters: str
+    description: str
+    raw_data: str
+
+    @classmethod
+    async def setup_db(cls, connection: psycopg.Connection):
+        async with connection.cursor() as cursor:
+            await cursor.execute("""
+                CREATE TABLE IF NOT EXISTS video_metadata (
+                    provider     TEXT NOT NULL,
+                    id           TEXT NOT NULL,
+                    chapters     TEXT,
+                    description  TEXT,
+                    raw_data     TEXT,
+                    PRIMARY KEY (provider, id)
+                );
+            """)
+            await connection.commit()
+
+
 class DataManager:
     @classmethod
     async def create(cls, config):
@@ -138,6 +162,7 @@ class DataManager:
         await SrcItem.setup_db(self.db.connection)
         await Warning.setup_db(self.db.connection)
         await Playlist.setup_db(self.db.connection)
+        await VideoMetadata.setup_db(self.db.connection)
 
     async def add_src_item(self, item: SrcItem):
         async with self.db.connection.cursor() as cursor:
@@ -191,6 +216,28 @@ class DataManager:
                 ON CONFLICT (url) DO NOTHING
                 RETURNING 1;
             """, (playlist.url,))
+
+            inserted = await cursor.fetchone()
+            await self.db.connection.commit()
+            return inserted is not None
+
+    async def add_video_metadata(self, metadata: VideoMetadata):
+        async with self.db.connection.cursor() as cursor:
+            await cursor.execute("""
+                INSERT INTO video_metadata (provider, id, chapters, description, raw_data)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT (provider, id) DO UPDATE
+                SET chapters = EXCLUDED.chapters,
+                    description = EXCLUDED.description,
+                    raw_data = EXCLUDED.raw_data
+                RETURNING 1;
+            """, (
+                metadata.provider,
+                metadata.id,
+                metadata.chapters,
+                metadata.description,
+                metadata.raw_data,
+            ))
 
             inserted = await cursor.fetchone()
             await self.db.connection.commit()

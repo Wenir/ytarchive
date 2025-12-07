@@ -6,6 +6,8 @@ import yt_dlp
 import ytarchive_lib.download_app as app
 import ytarchive_lib.data_manager as dm
 import logging
+import json
+from psycopg.rows import dict_row
 from pathlib import Path
 from conftest import check_items
 
@@ -36,6 +38,10 @@ class MockYoutubeDL:
             'channel': 'magnets99',
             'channel_id': 'UCYHyU6eGm4V2qjI_Sz4DO3A',
             'description': 'A dramatic look',
+            'chapters': [
+                {'start_time': 0, 'end_time': 3, 'title': 'First Half'},
+                {'start_time': 3, 'end_time': 6, 'title': 'Second Half'}
+            ],
         }
 
         base_filename = f"{video_info['title']} [{video_info['id']}]"
@@ -45,7 +51,6 @@ class MockYoutubeDL:
 
         if self.ydl_opts.get('writeinfojson'):
             info_file = Path(download_folder) / f"{base_filename}.info.json"
-            import json
             info_file.write_text(json.dumps(video_info))
 
         if self.ydl_opts.get('writedescription'):
@@ -120,3 +125,27 @@ async def test_download(data_manager, monkeypatch, print_bucket, print_db):
         assert "Dramatic Look [y8Kyi0WNg40].description" in filenames
         assert "Dramatic Look [y8Kyi0WNg40].jpg" in filenames
         assert "src_item.json" in filenames
+
+    async with data_manager.db.connection.cursor(row_factory=dict_row) as cursor:
+        await cursor.execute("""
+            SELECT provider, id, chapters, description, raw_data
+            FROM video_metadata
+            WHERE provider = %s AND id = %s
+        """, ("youtube", "y8Kyi0WNg40"))
+        row = await cursor.fetchone()
+
+    assert row is not None
+    assert row['provider'] == "youtube"
+    assert row['id'] == "y8Kyi0WNg40"
+
+    chapters = json.loads(row['chapters'])
+    assert len(chapters) == 2
+    assert chapters[0]['title'] == 'First Half'
+    assert chapters[1]['title'] == 'Second Half'
+
+    assert row['description'] == "A dramatic look"
+
+    raw_data = json.loads(row['raw_data'])
+    assert raw_data['title'] == "Dramatic Look"
+    assert raw_data['duration'] == 6
+    assert 'chapters' in raw_data

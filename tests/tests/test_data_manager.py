@@ -2,6 +2,7 @@ import pytest
 import io
 import ytarchive_lib.data_manager as dm
 import ytarchive_lib.config as config
+from psycopg.rows import dict_row
 from conftest import generate_id, check_items, check_warnings
 
 
@@ -420,3 +421,143 @@ async def test_clear_warning_does_not_affect_non_warning_items(data_manager):
             )
         ],
     )
+
+
+async def test_add_video_metadata(data_manager):
+    metadata = dm.VideoMetadata(
+        provider="youtube",
+        id="y8Kyi0WNg40",
+        chapters='[{"start_time": 0, "end_time": 10, "title": "Chapter 1"}]',
+        description="Test video description",
+        raw_data='{"title": "Test Video", "duration": 120}'
+    )
+
+    inserted = await data_manager.add_video_metadata(metadata)
+    assert inserted is True
+
+    # Verify the metadata was stored
+    async with data_manager.db.connection.cursor(row_factory=dict_row) as cursor:
+        await cursor.execute("""
+            SELECT provider, id, chapters, description, raw_data
+            FROM video_metadata
+            WHERE provider = %s AND id = %s
+        """, ("youtube", "y8Kyi0WNg40"))
+        row = await cursor.fetchone()
+
+    assert row is not None
+    assert row['provider'] == "youtube"
+    assert row['id'] == "y8Kyi0WNg40"
+    assert row['chapters'] == '[{"start_time": 0, "end_time": 10, "title": "Chapter 1"}]'
+    assert row['description'] == "Test video description"
+    assert row['raw_data'] == '{"title": "Test Video", "duration": 120}'
+
+
+async def test_add_video_metadata_update(data_manager):
+    metadata1 = dm.VideoMetadata(
+        provider="youtube",
+        id="y8Kyi0WNg40",
+        chapters='[{"start_time": 0, "end_time": 10, "title": "Chapter 1"}]',
+        description="Original description",
+        raw_data='{"title": "Original", "duration": 120}'
+    )
+
+    first_insert = await data_manager.add_video_metadata(metadata1)
+    assert first_insert is True
+
+    # Update with new metadata
+    metadata2 = dm.VideoMetadata(
+        provider="youtube",
+        id="y8Kyi0WNg40",
+        chapters='[{"start_time": 0, "end_time": 20, "title": "Updated Chapter"}]',
+        description="Updated description",
+        raw_data='{"title": "Updated", "duration": 240}'
+    )
+
+    second_insert = await data_manager.add_video_metadata(metadata2)
+    assert second_insert is True
+
+    # Verify only one record exists with updated values
+    async with data_manager.db.connection.cursor(row_factory=dict_row) as cursor:
+        await cursor.execute("""
+            SELECT provider, id, chapters, description, raw_data
+            FROM video_metadata
+        """)
+        rows = await cursor.fetchall()
+
+    assert len(rows) == 1
+    assert rows[0]['chapters'] == '[{"start_time": 0, "end_time": 20, "title": "Updated Chapter"}]'
+    assert rows[0]['description'] == "Updated description"
+    assert rows[0]['raw_data'] == '{"title": "Updated", "duration": 240}'
+
+
+async def test_add_video_metadata_multiple(data_manager):
+    metadata1 = dm.VideoMetadata(
+        provider="youtube",
+        id="video1",
+        chapters='[]',
+        description="Description 1",
+        raw_data='{"title": "Video 1"}'
+    )
+
+    metadata2 = dm.VideoMetadata(
+        provider="youtube",
+        id="video2",
+        chapters='[{"start_time": 0, "end_time": 30, "title": "Intro"}]',
+        description="Description 2",
+        raw_data='{"title": "Video 2"}'
+    )
+
+    metadata3 = dm.VideoMetadata(
+        provider="vimeo",
+        id="video1",
+        chapters='[]',
+        description="Description 3",
+        raw_data='{"title": "Video 3"}'
+    )
+
+    await data_manager.add_video_metadata(metadata1)
+    await data_manager.add_video_metadata(metadata2)
+    await data_manager.add_video_metadata(metadata3)
+
+    # Verify all three records exist
+    async with data_manager.db.connection.cursor(row_factory=dict_row) as cursor:
+        await cursor.execute("""
+            SELECT provider, id, description
+            FROM video_metadata
+            ORDER BY provider, id
+        """)
+        rows = await cursor.fetchall()
+
+    assert len(rows) == 3
+    assert rows[0]['provider'] == "vimeo"
+    assert rows[0]['id'] == "video1"
+    assert rows[1]['provider'] == "youtube"
+    assert rows[1]['id'] == "video1"
+    assert rows[2]['provider'] == "youtube"
+    assert rows[2]['id'] == "video2"
+
+
+async def test_add_video_metadata_empty_fields(data_manager):
+    metadata = dm.VideoMetadata(
+        provider="youtube",
+        id="empty_test",
+        chapters="",
+        description="",
+        raw_data='{"minimal": "data"}'
+    )
+
+    inserted = await data_manager.add_video_metadata(metadata)
+    assert inserted is True
+
+    # Verify empty strings are stored correctly
+    async with data_manager.db.connection.cursor(row_factory=dict_row) as cursor:
+        await cursor.execute("""
+            SELECT chapters, description
+            FROM video_metadata
+            WHERE provider = %s AND id = %s
+        """, ("youtube", "empty_test"))
+        row = await cursor.fetchone()
+
+    assert row is not None
+    assert row['chapters'] == ""
+    assert row['description'] == ""

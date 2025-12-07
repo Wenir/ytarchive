@@ -8,9 +8,10 @@ import zipfile
 import asyncio
 from pathlib import Path
 from dataclasses import asdict
+from pprint import pprint
 
 from ytarchive_lib.config import load_config
-from ytarchive_lib.data_manager import DataManager, SrcItem
+from ytarchive_lib.data_manager import DataManager, SrcItem, VideoMetadata
 
 DOWNLOAD_FOLDER = "/tmp/ytarchive"
 
@@ -48,6 +49,7 @@ def download(url):
         info = ydl.extract_info(url)
 
         info = ydl.sanitize_info(info)
+        #pprint(info)
 
         return info
 
@@ -88,7 +90,17 @@ async def amain():
         selected_item = random.choice(new_items)
         logging.info(f"Selected item: {selected_item}")
 
-        download(selected_item.url)
+        info = download(selected_item.url)
+
+        video_metadata = VideoMetadata(
+            provider=selected_item.provider,
+            id=selected_item.id,
+            chapters=json.dumps(info.get('chapters', [])),
+            description=info.get('description', ""),
+            raw_data=json.dumps(info),
+        )
+        await data_manager.add_video_metadata(video_metadata)
+        logging.info(f"Stored video metadata for: {selected_item.title}")
 
         with open(Path(DOWNLOAD_FOLDER) / "src_item.json", "w") as f:
             json.dump(asdict(selected_item), f, default=str)
