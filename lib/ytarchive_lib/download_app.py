@@ -95,7 +95,7 @@ async def amain():
         video_metadata = VideoMetadata(
             provider=selected_item.provider,
             id=selected_item.id,
-            chapters=json.dumps(info.get('chapters', [])),
+            chapters=json.dumps(info.get('chapters') or []),
             description=info.get('description', ""),
             raw_data=json.dumps(info),
         )
