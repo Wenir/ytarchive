@@ -352,7 +352,14 @@ class DataManager:
 
         obj = self.bucket.Object(f"archive/{key}")
 
-        res = obj.upload_fileobj(encrypted, ExtraArgs={"Tagging": "archive=true"})
+        res = obj.upload_fileobj(
+            encrypted,
+            ExtraArgs={"Tagging": "archive=true"},
+            Config=boto3.s3.transfer.TransferConfig(
+                multipart_chunksize=128 * 1024 * 1024,
+                #multipart_threshold=128 * 1024 * 1024,
+            ),
+        )
         logging.info(f"Uploaded to bucket with status {res}")
 
         res = obj.wait_until_exists()
