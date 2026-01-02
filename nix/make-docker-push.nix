@@ -23,6 +23,7 @@ writeShellApplication {
         copy \
         --dest-creds "nologin:$key" \
         "docker-archive://${image}" \
-        "docker://$endpoint/${name}:latest"
+        "docker://$endpoint/${name}:latest" | cat
+        # 'cat' to prevent skopeo from printing a lot of garbage
   '';
 }
