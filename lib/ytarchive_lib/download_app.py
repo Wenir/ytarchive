@@ -91,6 +91,7 @@ async def amain():
         logging.info(f"Selected item: {selected_item}")
 
         info = download(selected_item.url)
+        del info["automatic_captions"]
 
         video_metadata = VideoMetadata(
             provider=selected_item.provider,
