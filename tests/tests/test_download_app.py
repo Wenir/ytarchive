@@ -38,6 +38,7 @@ class MockYoutubeDL:
             'channel': 'magnets99',
             'channel_id': 'UCYHyU6eGm4V2qjI_Sz4DO3A',
             'description': 'A dramatic look',
+            'automatic_captions': {},
             'chapters': [
                 {'start_time': 0, 'end_time': 3, 'title': 'First Half'},
                 {'start_time': 3, 'end_time': 6, 'title': 'Second Half'}
