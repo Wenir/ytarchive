@@ -26,12 +26,12 @@ jobs:
       - id: create-pr
         uses: peter-evans/create-pull-request@v6
         with:
-          branch: update_deps
+          branch: update_flake
           delete-branch: true
           committer: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
           author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
-          commit-message: 'update deps'
-          title: 'update deps'
+          commit-message: 'Update flake inputs'
+          title: 'Update flake inputs'
           labels: 'dependencies'
           body: |
-            Automated bump of dependencies
+            Automated update of flake inputs
