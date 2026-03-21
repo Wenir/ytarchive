@@ -16,6 +16,16 @@ from ytarchive_lib.data_manager import DataManager, SrcItem, VideoMetadata
 DOWNLOAD_FOLDER = "/tmp/ytarchive"
 
 
+class _YdlLogger:
+    def debug(self, msg): pass
+    def info(self, msg): pass
+    def warning(self, msg):
+        if "Some formats may be missing" in msg:
+            raise Exception(msg)
+    def error(self, msg):
+        logging.error(msg)
+
+
 def download(url):
     if shutil.which("ffmpeg") is None:
         raise Exception("FFmpeg is not installed or not found in PATH. This operation requires FFmpeg.")
@@ -42,6 +52,7 @@ def download(url):
         'writesubtitles': True,
         'writethumbnail': True,
         'outtmpl': '%(title).150B [%(id)s].%(ext)s',
+        'logger': _YdlLogger(),
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
