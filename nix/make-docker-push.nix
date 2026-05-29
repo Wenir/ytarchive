@@ -18,6 +18,8 @@ writeShellApplication {
     endpoint="$("${tofu}" output --raw registry-endpoint)"
     key="$("${tofu}" output --raw registry-key)"
 
+    export CONTAINERS_REGISTRIES_CONF=/dev/null
+
     ${lib.getExe skopeo} \
         --insecure-policy \
         copy \
