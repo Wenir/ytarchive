@@ -22,6 +22,8 @@ resource "scaleway_job_definition" "playlist-app" {
   timeout      = "10m"
   region       = "nl-ams"
 
+  local_storage_capacity = 5120
+
   secret_reference {
     secret_id = scaleway_secret.job_environment.id
     file      = "/.env"
@@ -40,6 +42,8 @@ resource "scaleway_job_definition" "download-app" {
   image_uri    = "${scaleway_registry_namespace.main.endpoint}/download-app:latest"
   timeout      = "10m"
   region       = "nl-ams"
+
+  local_storage_capacity = 5120
 
   secret_reference {
     secret_id = scaleway_secret.job_environment.id
