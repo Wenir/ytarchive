@@ -81,9 +81,6 @@ def test_get_suffix(crypt, sizes):
 
         assert joined_result == joined[:-8]
         assert result.suffix == joined[-8:]
-        logging.error(f"Suffix: {result.suffix}, Length: {len(result.suffix)}, Expected: {joined}, jouned_result: {joined_result}")
-        logging.error(f"res: {res}")
-        #assert sizes != (2, 2, 2, 7)
 
 
 def test_encrypt_decrypt_roundtrip(crypt):
