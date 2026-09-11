@@ -24,16 +24,21 @@ def get_flat_playlist(playlist_url):
 
 
 def make_item(entry):
-    return SrcItem(
-        provider="youtube",
-        id=entry["id"],
-        url=entry["url"],
-        title=entry["title"],
-        channel=entry["channel"],
-        channel_id=entry["channel_id"],
-        channel_url=entry["channel_url"],
-        duration=entry["duration"]
-    )
+    try:
+        return SrcItem(
+            provider="youtube",
+            id=entry["id"],
+            url=entry["url"],
+            title=entry["title"],
+            channel=entry.get("channel"),
+            channel_id=entry.get("channel_id"),
+            channel_url=entry["channel_url"],
+            duration=entry["duration"]
+        )
+    except KeyError as e:
+        logging.error(f"Missing key in entry: {e}")
+        logging.error("Entry data: " + json.dumps(entry, indent=2))
+        raise
 
 
 def detect_warnings(item: SrcItem):
