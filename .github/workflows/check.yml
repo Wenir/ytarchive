@@ -27,7 +27,7 @@ jobs:
       - name: merge
         run: gh pr merge ${{ github.event.issue.number }} --merge --admin
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
       - name: report issues
         if: failure()
