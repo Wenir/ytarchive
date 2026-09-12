@@ -1,0 +1,15 @@
+on: issue_comment
+
+jobs:
+  pr_check_owner_comment:
+    name: PR comment
+    if: |
+      github.event.issue.pull_request
+      && github.event.comment.body == '/run'
+      && github.event.comment.author_association == 'OWNER'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo A comment on PR $NUMBER
+        env:
+          NUMBER: ${{ github.event.issue.number }}
