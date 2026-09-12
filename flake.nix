@@ -19,15 +19,15 @@
           #ps.to_file_like_obj
           ps.ytarchive_lib
           #ps.psycopg
-        ];
+        ]
 
-        python = pkgs.python3.withPackages python-libs;
+        python = pkgs.python3.withPackages python-libs
       in
       rec {
         legacyPackages = rec {
           playlist = pkgs.make-bundle {
-            app_name = "playlist";
-            inherit python-libs;
+            app_name = "playlist
+            inherit python-libs
           };
 
           download = pkgs.make-bundle {
