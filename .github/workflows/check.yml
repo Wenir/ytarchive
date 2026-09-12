@@ -1,3 +1,5 @@
+name: Check PR, merge if ok
+
 on: issue_comment
 
 jobs:
@@ -5,7 +7,7 @@ jobs:
     name: PR comment
     if: |
       github.event.issue.pull_request
-      && github.event.comment.body == '/run'
+      && github.event.comment.body == '/check'
       && github.event.comment.author_association == 'OWNER'
     runs-on: ubuntu-latest
     steps:
@@ -19,3 +21,6 @@ jobs:
 
       - name: check
         run: nix build .#pushall
+
+      - name: merge
+        run: gh pr merge ${{ github.event.issue.number }} --merge --admin
