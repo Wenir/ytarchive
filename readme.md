@@ -5,3 +5,4 @@
 - create bucket in scaleway for state
 - ./tofu.sh apply
 - nix run .#pushall
+
