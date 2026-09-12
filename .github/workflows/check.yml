@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        ref: refs/pull/${{ github.event.issue.number }}/merge
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/merge
 
       - uses: cachix/install-nix-action@v27
         with:
