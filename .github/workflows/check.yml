@@ -29,3 +29,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+      - name: report issues
+        if: failure()
+        run: gh pr comment ${{ github.event.issue.number }} --body "Check failed, see [action run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details"
+        env:
+          GH_TOKEN: ${{ github.token }}
