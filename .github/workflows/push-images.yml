@@ -33,6 +33,7 @@ jobs:
           TF_VAR_scaleway_secret_key: ${{ secrets.TF_VAR_SCALEWAY_SECRET_KEY }}
           TF_VAR_scaleway_organization_id: ${{ secrets.TF_VAR_SCALEWAY_ORGANIZATION_ID }}
           TF_VAR_scaleway_project_id: ${{ secrets.TF_VAR_SCALEWAY_PROJECT_ID }}
+          TF_VAR_alert_email: ${{ secrets.TF_VAR_ALERT_EMAIL }}
           TF_VAR_prefix_name: ${{ secrets.TF_VAR_PREFIX_NAME }}
           TF_VAR_data_key: ${{ secrets.TF_VAR_DATA_KEY }}
           TF_VAR_data_iv: ${{ secrets.TF_VAR_DATA_IV }}
@@ -51,6 +52,7 @@ jobs:
           TF_VAR_scaleway_secret_key: ${{ secrets.TF_VAR_SCALEWAY_SECRET_KEY }}
           TF_VAR_scaleway_organization_id: ${{ secrets.TF_VAR_SCALEWAY_ORGANIZATION_ID }}
           TF_VAR_scaleway_project_id: ${{ secrets.TF_VAR_SCALEWAY_PROJECT_ID }}
+          TF_VAR_alert_email: ${{ secrets.TF_VAR_ALERT_EMAIL }}
           TF_VAR_prefix_name: ${{ secrets.TF_VAR_PREFIX_NAME }}
           TF_VAR_data_key: ${{ secrets.TF_VAR_DATA_KEY }}
           TF_VAR_data_iv: ${{ secrets.TF_VAR_DATA_IV }}
