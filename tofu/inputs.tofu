@@ -1,6 +1,11 @@
 # ---------------------------------------------------------------------------- #
 # app
 
+variable "alert_email" {
+  type     = string
+  nullable = false
+}
+
 variable "prefix_name" {
   type     = string
   nullable = false
