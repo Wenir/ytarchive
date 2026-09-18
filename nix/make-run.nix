@@ -5,12 +5,14 @@
 }:
 {
   app
+, runtimeInputs ? []
 }:
 let
   tofu = "${lib.getExe opentofu}";
 in
 writeShellApplication {
   name = "${app.name}-run";
+  inherit runtimeInputs;
   text = ''
     pushd tofu
 

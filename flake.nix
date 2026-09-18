@@ -50,7 +50,10 @@
             };
           };
 
-          tests = pkgs.make-run { app = pkgs.callPackage ./tests {}; };
+          tests = pkgs.make-run {
+            app = pkgs.callPackage ./tests {};
+            runtimeInputs = [ pkgs.ffmpeg pkgs.deno ];
+          };
 
           pushall = pkgs.writeShellApplication {
             name = "pushall";
