@@ -39,12 +39,12 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - name: Test
-        run: nix run .#tests
-
       - name: Init tofu backend
         working-directory: tofu
         run: nix run ..#tofu -- init
+
+      - name: Test
+        run: nix run .#tests
 
       - name: Push all Docker images
         run: nix run .#pushall
