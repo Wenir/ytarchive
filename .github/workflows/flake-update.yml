@@ -2,7 +2,7 @@ name: Weekly Flake Update
 
 on:
   schedule:
-    - cron: '23 9 * * 5'  # Every Friday at 09:23 UTC
+    - cron: '23 1 * * 5'  # Every Friday at 01:23 UTC
   workflow_dispatch:
 
 jobs:
