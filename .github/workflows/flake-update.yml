@@ -5,6 +5,11 @@ on:
     - cron: '23 1 * * 5'  # Every Friday at 01:23 UTC
   workflow_dispatch:
 
+concurrency:
+  group: main
+  cancel-in-progress: false
+  queue: max
+
 jobs:
   update:
     runs-on: ubuntu-latest

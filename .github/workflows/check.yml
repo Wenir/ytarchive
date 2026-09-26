@@ -2,6 +2,11 @@ name: Check PR, merge if ok
 
 on: issue_comment
 
+concurrency:
+  group: main
+  cancel-in-progress: false
+  queue: max
+
 jobs:
   pr_check_owner_comment:
     name: PR comment
