@@ -10,6 +10,23 @@ jobs:
       && github.event.comment.body == '/check'
       && github.event.comment.author_association == 'OWNER'
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_state_access_key: ${{ secrets.TF_VAR_STATE_ACCESS_KEY }}
+      TF_VAR_state_secret_key: ${{ secrets.TF_VAR_STATE_SECRET_KEY }}
+      TF_VAR_state_bucket_name: ${{ secrets.TF_VAR_STATE_BUCKET_NAME }}
+      TF_VAR_scaleway_access_key: ${{ secrets.TF_VAR_SCALEWAY_ACCESS_KEY }}
+      TF_VAR_scaleway_secret_key: ${{ secrets.TF_VAR_SCALEWAY_SECRET_KEY }}
+      TF_VAR_scaleway_organization_id: ${{ secrets.TF_VAR_SCALEWAY_ORGANIZATION_ID }}
+      TF_VAR_scaleway_project_id: ${{ secrets.TF_VAR_SCALEWAY_PROJECT_ID }}
+      TF_VAR_alert_email: ${{ secrets.TF_VAR_ALERT_EMAIL }}
+      TF_VAR_prefix_name: ${{ secrets.TF_VAR_PREFIX_NAME }}
+      TF_VAR_data_key: ${{ secrets.TF_VAR_DATA_KEY }}
+      TF_VAR_data_iv: ${{ secrets.TF_VAR_DATA_IV }}
+      TF_VAR_src_playlist: ${{ secrets.TF_VAR_SRC_PLAYLIST }}
+      TF_VAR_tests_src_playlist: ${{ secrets.TF_VAR_TESTS_SRC_PLAYLIST }}
+      TF_VAR_tg_bot_token: ${{ secrets.TF_VAR_TG_BOT_TOKEN }}
+      TF_VAR_tg_chat_id: ${{ secrets.TF_VAR_TG_CHAT_ID }}
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,6 +40,13 @@ jobs:
 
       - name: check
         run: nix build .#pushall
+
+      - name: Init tofu backend
+        working-directory: tofu
+        run: nix run ..#tofu -- init
+
+      - name: Test
+        run: nix run .#tests
 
       - name: merge
         run: gh pr merge ${{ github.event.issue.number }} --merge --admin
